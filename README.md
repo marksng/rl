@@ -1,20 +1,26 @@
 # reinforcement learning - defining and solving rl environments
 this repository was created throughout CSE564 and modified to be presentable.
+
+## algorithms used
+  - tabular methods - 
+    - q-learning 
+    - sarsa
+    - dynamic programming (value iteration)
+  - network-based methods - 
+    - deep q-network
+    - double deep q-network
+  - actor-critic methods - 
+    - q actor-critic
+
 ## environments used
   - forest environment (grid, custom defined)
   
-    ![Sample Forest Render](forest_env/sample.png)
-    
-    POI Name      | Impact 
-    --------------|-------
-    Safe House    |  +100
-    Picnic Basket |  +10
-    Berries       |  +5
-    Deer Poop     |  -5
-    Twigs         |  -5
-    Trees         |  -10
-    Bear Trap     |  -100
+    ![Sample Forest Render](sample_renders/forest_sample.png)
     
   - openAI's cartpole-v1
-  - openAI's acrobot-v1
 
+    ![Sample Cartpole Render](sample_renders/cartpole_sample.png)
+    
+  - openAI's acrobot-v1
+    
+    ![Sample Acrobot Render](sample_renders/acrobot_sample.png)
