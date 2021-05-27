@@ -1,2 +1,5 @@
-# rl
-defining and solving RL environments
+# reinforcement learning 
+defining and solving RL environments with..
+  - tabular methods
+  - deep learning approach
+  - actor-critic methods
