@@ -1,1 +1,1 @@
-# reinforcement learning ## defining and solving RL environments
+**reinforcement learning** defining and solving rl environments
