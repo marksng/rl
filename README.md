@@ -1,5 +1,5 @@
 # reinforcement learning - defining and solving rl environments
-this repository was created throughout cse564 (spring 2021 w/ Alina Vereshchaka) and modified to be presentable.
+this repository was created throughout cse564 (spring-21 w/ Alina Vereshchaka) and modified to be presentable.
 
 ## algorithms used
   - tabular methods - 
