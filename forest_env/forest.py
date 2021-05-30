@@ -1,3 +1,9 @@
+import os, cv2, copy
+import numpy as np
+
+from gym import spaces, Env
+import matplotlib.pyplot as plt
+
 # class that defines the grid environment to be used
 class Forest(Env):
  
@@ -5,7 +11,8 @@ class Forest(Env):
  
     # function that defines the action and observation space
     # outputs - None
-    def __init__(self):
+    def __init__(self, one_hot_encoding=True):
+        self.ohe = one_hot_encoding
         self.stoh = False
         # define the environment
         self.dims = (5, 5)                                                     # dimensions of the environment
@@ -20,7 +27,7 @@ class Forest(Env):
         self.agent_img = 'agent_alive_up'                                      # for rendering, image of agent's last state
  
         # load images used to visualize the environment
-        img_dir = os.path.join(cwd, 'images')
+        img_dir = 'images'
         self.images = {}
         fns = [i for i in os.listdir(img_dir) if i.endswith('.png')]
         for c, fn in enumerate(fns):
@@ -75,15 +82,13 @@ class Forest(Env):
                 print('\rdrawing initial environment.. %d/%d' % (i+1, len(self.POIs)), end='')
         print('\rdrawing initial environment.. DONE.')
  
-        #self.init_state = np.sign(self.init_state)
- 
  
     # function that resets the state of the environment to the initial state
     # inputs - None
     # outputs - the initial observation state
     def reset(self):
-        self.energy = copy.deepcopy(self.init_energy)
-        self.agent = copy.deepcopy(self.init_agent)
+        self.energy = self.init_energy
+        self.agent = copy.copy(self.init_agent)
         self.state = copy.deepcopy(self.init_state)
  
         self.background = copy.deepcopy(self.init_background)
@@ -92,10 +97,12 @@ class Forest(Env):
         self.agent_img = 'agent_alive_down'
         
         observation = self.to_state(self.agent)
-        
-        ret = np.zeros(self.observation_space.n)
-        ret[observation - 1] = 1
-        return ret
+        if self.ohe:
+            ret = np.zeros(self.observation_space.n)
+            ret[observation - 1] = 1
+            return ret
+        else:
+            return observation
  
  
     # function that executes one timestep within the environment
@@ -109,9 +116,7 @@ class Forest(Env):
  
         # update the position of the agent based on the action 
         self.agent, agent_img = self.__calculate_direction__(action)
- 
         self.energy -= 1
- 
         observation = self.to_state(self.agent)
  
         # check if agent is done
@@ -129,40 +134,47 @@ class Forest(Env):
  
         reward = self.state[tuple(self.agent)]
         
-        self.state[tuple(self.agent)] = min([reward, 0]) if reward > 0 else max([reward, 0])
+        self.state[tuple(self.agent)] = 0
         
         info = {}
 
-        ret = np.zeros(self.observation_space.n)
-        ret[observation - 1] = 1
-
-        return ret, reward, done, info
+        observation = self.to_state(self.agent)
+        if self.ohe:
+            ret = np.zeros(self.observation_space.n)
+            ret[observation - 1] = 1
+            return ret, reward, done, info
+        else:
+            return observation, reward, done, info
  
  
     # function that, given an action, returns the next state and the probability of that state
     # inputs - loc - optional, location to explore. if not defined, will be set to agent's current position
     # outputs - dictionary key-value pair of (action -> (state, probability))
-    def explore(self, loc=None):
-        if loc is None:
+    def explore(self, state=None):
+        if state is None:
             loc = self.agent
- 
-        ret = {}
-        x, y = loc
-        actions = [[x, y - 1],   # up
-                   [x - 1, y],   # left
-                   [x, y + 1],   # down
-                   [x + 1, y]]   # right
- 
+        else:
+            loc = self.to_coord(state)
+            
+        ret = {} # dictionary of (action -> (reward, prob of reward))
+        x, y = loc 
+        actions = [[x, y - 1], # up
+                   [x - 1, y], # left
+                   [x, y + 1], # down 
+                   [x + 1, y]] # right
+        
+        # clip resulting coordinates so no coordinates are out of bounds
         for i, _ in enumerate(actions):
             actions[i] = np.clip(actions[i], 0, self.dims[0] - 1)
             actions[i] = self.to_state(actions[i])
+            
         
-        for i, act in enumerate(actions):
+        for i, a in enumerate(actions):
             if not self.stoh:
-                ret[i] = [(self.to_state(act), 1)] # (reward, probability of reward)
+                ret[i] = [(self.to_state(a), 1)]
             else:
-                ret[i] = [(self.to_state(act), .5)]
- 
+                ret[i] = [(self.to_state(a), .5)]
+                
                 if i % 2 == 0:
                     others = [(actions[1], .25),
                               (actions[3], .25)]
