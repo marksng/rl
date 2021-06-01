@@ -46,7 +46,7 @@ class Forest(Env):
         init_deer_poop = POI(impact=-.05,                                       # deer poop     -> BAD. looks like berries, NOT BERRIES. NOT GOOD. 
                              locations=set([(1,2), (0,3)]), 
                              img_avail='deer_poop_avail')      
-        init_twig = POI(impact=.05,                                             # twigs         -> BAD. it's dark. he tripped. PAIN. 
+        init_twig = POI(impact=-.05,                                             # twigs         -> BAD. it's dark. he tripped. PAIN. 
                         locations=set([(1,4), (2,3), (4,1)]),
                         img_avail='twig')
         init_trees = POI(impact=-.1,                                            # trees         -> BAD. don't run into trees. not good. 
